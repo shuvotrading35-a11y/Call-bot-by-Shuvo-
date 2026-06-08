@@ -3,12 +3,16 @@ from config import BOT_TOKEN, ADMIN_IDS
 from database import init_db
 from utils.logger import setup_logger
 
-from handlers.start import start_handler
+from handlers.start import start_handler, user_panel_handler, admin_panel_handler
 from handlers.user.force_join import force_join_handler
 from handlers.user.send_call import send_call_conv
 from handlers.user.profile import profile_handler
 from handlers.user.referral import referral_handler
-from handlers.user.subscription import buy_subscription_handler, subscription_callback_handler, payment_callback_handler
+from handlers.user.subscription import (
+    buy_subscription_handler,
+    subscription_callback_handler,
+    payment_callback_handler
+)
 from handlers.user.redeem import redeem_conv
 from handlers.user.statistics import stats_handler
 from handlers.user.daily_claim import daily_handler
@@ -33,9 +37,15 @@ def main():
     app = Application.builder().token(BOT_TOKEN).build()
     app.bot_data['admin_ids'] = ADMIN_IDS
 
-    # User handlers
+    # Panel switch (আগে add করতে হবে যাতে conflict না হয়)
+    app.add_handler(user_panel_handler)
+    app.add_handler(admin_panel_handler)
+
+    # Start
     app.add_handler(start_handler)
     app.add_handler(force_join_handler)
+
+    # User handlers
     app.add_handler(send_call_conv)
     app.add_handler(profile_handler)
     app.add_handler(referral_handler)
@@ -62,8 +72,8 @@ def main():
 
     async def error_handler(update, context):
         logger.error(f"Update {update} caused error {context.error}")
-    app.add_error_handler(error_handler)
 
+    app.add_error_handler(error_handler)
     logger.info("Bot started...")
     app.run_polling()
 
