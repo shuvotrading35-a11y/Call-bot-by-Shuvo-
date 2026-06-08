@@ -7,7 +7,8 @@ def admin_main_menu():
         ["🎁 Generate Code", "⚙️ Settings"],
         ["📈 Global Stats", "🚫 Banned Users"],
         ["🌐 Broadcast", "🔓 Unban User"],
-        ["☎️ Support Tickets"]
+        ["☎️ Support Tickets"],
+        ["👤 User Panel"]   # Admin user panel এ যেতে পারবে
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
