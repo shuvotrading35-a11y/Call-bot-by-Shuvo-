@@ -1,6 +1,6 @@
 from telegram import ReplyKeyboardMarkup
 
-def user_main_menu():
+def user_main_menu(is_admin: bool = False):
     keyboard = [
         ["🚀 Send Call", "👤 My Profile"],
         ["👥 Referral", "🛒 Buy Subscription"],
@@ -8,6 +8,8 @@ def user_main_menu():
         ["📊 Statistics", "🎯 Daily Claim"],
         ["☎️ Support"]
     ]
+    if is_admin:
+        keyboard.append(["👑 Admin Panel"])  # Admin হলে extra button
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
 def cancel_keyboard():
