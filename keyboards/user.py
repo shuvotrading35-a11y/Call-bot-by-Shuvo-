@@ -4,12 +4,11 @@ def user_main_menu(is_admin: bool = False):
     keyboard = [
         ["🚀 Send Call", "👤 My Profile"],
         ["👥 Referral", "🛒 Buy Subscription"],
-        ["🎁 Redeem Code"],
-        ["📊 Statistics", "🎯 Daily Claim"],
-        ["☎️ Support"]
+        ["🎁 Redeem Code", "🎯 Daily Claim"],   # একই row তে
+        ["📊 Statistics", "☎️ Support"]         # পাশাপাশি
     ]
     if is_admin:
-        keyboard.append(["👑 Admin Panel"])  # Admin হলে extra button
+        keyboard.append(["👑 Admin Panel"])
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
 def cancel_keyboard():
