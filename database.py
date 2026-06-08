@@ -67,6 +67,7 @@ def init_db():
     CREATE TABLE IF NOT EXISTS force_channels (
         channel_id TEXT PRIMARY KEY,
         channel_name TEXT,
+        invite_link TEXT,
         added_by INTEGER,
         added_date TEXT DEFAULT (datetime('now','localtime'))
     );
@@ -117,9 +118,9 @@ def init_db():
 
     # Default settings
     defaults = [
-        ('referral_bonus', '10'),
+        ('referral_bonus', '1'),
         ('daily_reward_min', '1'),
-        ('daily_reward_max', '10'),
+        ('daily_reward_max', '1'),
         ('free_call_limit', '5'),
         ('free_rate_limit', '3'),
         ('premium_rate_limit', '20'),
