@@ -32,7 +32,10 @@ async def search_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"💰 Credits: {user['credits']}\n"
         f"🔒 Banned: {'Yes' if user['is_banned'] else 'No'}"
     )
-    keyboard = [["✏️ Edit Credits", "🚫 Ban User"], ["🔓 Unban", "🔙 Admin Menu"]]
+    keyboard = [
+        [{"text": "✏️ Edit Credits", "style": "success"}, {"text": "🚫 Ban User", "style": "danger"}],
+        [{"text": "🔓 Unban", "style": "primary"}, {"text": "🔙 Admin Menu", "style": "success"}],
+    ]
     await update.message.reply_text(info, reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True))
     return SHOW_USER
 
