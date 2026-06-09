@@ -24,7 +24,10 @@ async def ticket_select(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return TICKET_SELECT
     context.user_data['ticket_id'] = tid
     text = f"Ticket #{tid}\nFrom: @{ticket['username']} ({ticket['user_id']})\nMessage: {ticket['message']}\nStatus: {ticket['status']}"
-    keyboard = [["💬 Reply", "✅ Close"], ["🔙 Admin Menu"]]
+    keyboard = [
+        [{"text": "💬 Reply", "style": "success"}, {"text": "✅ Close", "style": "success"}],
+        [{"text": "🔙 Admin Menu", "style": "primary"}],
+    ]
     await update.message.reply_text(text, reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True))
     return TICKET_ACTION
 
