@@ -9,7 +9,10 @@ CHOOSE_METHOD, GET_INPUT = range(2)
 
 async def unban_entry(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await is_admin(update): return
-    keyboard = [["🆔 Unban by User ID", "👤 Unban by Username"], ["📋 View Banned Users", "🔙 Admin Menu"]]
+    keyboard = [
+        [{"text": "🆔 Unban by User ID", "style": "primary"}, {"text": "👤 Unban by Username", "style": "primary"}],
+        [{"text": "📋 View Banned Users", "style": "primary"}, {"text": "🔙 Admin Menu", "style": "success"}],
+    ]
     await update.message.reply_text("🔓 Unban User", reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True))
     return CHOOSE_METHOD
 
@@ -81,7 +84,6 @@ async def process_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"👤 Username: @{user['username'] or 'N/A'}",
         reply_markup=admin_main_menu()
     )
-    # Notify user
     try:
         await context.bot.send_message(user_id, "✅ You have been unbanned! You can now use the bot again.")
     except:
