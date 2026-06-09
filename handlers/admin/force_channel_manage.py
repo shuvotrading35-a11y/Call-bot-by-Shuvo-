@@ -4,14 +4,13 @@ from handlers.common import is_admin
 from database import get_connection
 from keyboards.admin import admin_main_menu
 
-# 3 আলাদা state — আগের bug ছিল ADD_CHANNEL=0 আর MENU=0 একই ছিল
 MENU, WAITING_ADD, WAITING_REMOVE = range(3)
 
 async def channel_manage_entry(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await is_admin(update): return
     keyboard = [
-        ["➕ Add Channel", "➖ Remove Channel"],
-        ["📋 List Channels", "🔙 Admin Menu"]
+        [{"text": "➕ Add Channel", "style": "success"}, {"text": "➖ Remove Channel", "style": "danger"}],
+        [{"text": "📋 List Channels", "style": "primary"}, {"text": "🔙 Admin Menu", "style": "success"}],
     ]
     await update.message.reply_text(
         "📢 Force Channel Management",
@@ -80,14 +79,11 @@ async def channel_add(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     parts = text.split()
 
-    # Public channel — শুধু @username
     if len(parts) == 1 and parts[0].startswith("@"):
         username = parts[0]
         invite_link = f"https://t.me/{username.replace('@', '')}"
-        channel_id = username  # public channel এ @username দিয়েই কাজ হয়
+        channel_id = username
         channel_name = username
-
-        # Bot দিয়ে verify করো
         try:
             chat = await context.bot.get_chat(chat_id=username)
             channel_id = str(chat.id)
@@ -95,36 +91,27 @@ async def channel_add(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             await update.message.reply_text(
                 f"❌ Channel খুঁজে পাওয়া যায়নি: {e}\n\n"
-                "নিশ্চিত করো:\n"
-                "• Bot টি channel এ admin আছে\n"
-                "• Username সঠিক"
+                "নিশ্চিত করো:\n• Bot টি channel এ admin আছে\n• Username সঠিক"
             )
             return WAITING_ADD
 
-    # Private channel — ID + invite link
     elif len(parts) == 2:
         channel_id = parts[0]
         invite_link = parts[1]
-
-        # Verify করো
         try:
             chat = await context.bot.get_chat(chat_id=channel_id)
             channel_name = chat.title or channel_id
         except Exception as e:
             await update.message.reply_text(
-                f"❌ Channel verify করা যায়নি: {e}\n\n"
-                "Bot কি channel এ admin আছে?"
+                f"❌ Channel verify করা যায়নি: {e}\n\nBot কি channel এ admin আছে?"
             )
             return WAITING_ADD
     else:
         await update.message.reply_text(
-            "❌ Format ভুল!\n\n"
-            "Public: @channelname\n"
-            "Private: -1001234567890 https://t.me/+xxxxx"
+            "❌ Format ভুল!\n\nPublic: @channelname\nPrivate: -1001234567890 https://t.me/+xxxxx"
         )
         return WAITING_ADD
 
-    # DB তে save করো
     conn = get_connection()
     conn.execute(
         "INSERT OR REPLACE INTO force_channels (channel_id, channel_name, invite_link, added_by) VALUES (?,?,?,?)",
@@ -135,9 +122,7 @@ async def channel_add(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(
         f"✅ Channel যোগ হয়েছে!\n\n"
-        f"📛 Name: {channel_name}\n"
-        f"🆔 ID: {channel_id}\n"
-        f"🔗 Link: {invite_link}",
+        f"📛 Name: {channel_name}\n🆔 ID: {channel_id}\n🔗 Link: {invite_link}",
         reply_markup=admin_main_menu()
     )
     return ConversationHandler.END
@@ -151,7 +136,6 @@ async def channel_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
     conn = get_connection()
     row = conn.execute("SELECT channel_name FROM force_channels WHERE channel_id=?", (text,)).fetchone()
     if not row:
-        # @username দিয়ে খোঁজো
         row = conn.execute("SELECT channel_id, channel_name FROM force_channels WHERE channel_name=?", (text,)).fetchone()
         if row:
             text = row['channel_id']
@@ -164,10 +148,7 @@ async def channel_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
     conn.execute("DELETE FROM force_channels WHERE channel_id=?", (text,))
     conn.commit()
     conn.close()
-    await update.message.reply_text(
-        f"✅ Channel remove হয়েছে।",
-        reply_markup=admin_main_menu()
-    )
+    await update.message.reply_text("✅ Channel remove হয়েছে।", reply_markup=admin_main_menu())
     return ConversationHandler.END
 
 channel_manage_conv = ConversationHandler(
