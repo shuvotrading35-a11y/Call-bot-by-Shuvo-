@@ -33,7 +33,8 @@ async def receive_target(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Invalid number. Try again:\nExample: 017XXXXXXXX")
         return TARGET_NUMBER
     context.user_data['target'] = number
-    keyboard = [[{"text": str(limit), "style": "primary"}] for limit in CALL_LIMITS]
+    styles = ["primary", "danger", "success"]
+    keyboard = [[{"text": str(limit), "style": styles[(limit - 1) % 3]}] for limit in CALL_LIMITS]
     keyboard.append([{"text": "🔙 Cancel", "style": "danger"}])
     await update.message.reply_text("⚡ Select Call Limit:", reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True))
     return CALL_LIMIT
@@ -101,10 +102,10 @@ async def receive_limit(update: Update, context: ContextTypes.DEFAULT_TYPE):
             updated = get_user(user_id)
             remaining = f"\n💰 Remaining Credits: {updated['credits']}"
         await update.message.reply_text(
-            f"✅ Request successful!\n\n"
+            f"✅ Request Submitted!\n\n"
             f"📞 Target: {target}\n"
             f"📊 Limit: {limit}\n"
-            f"☄️ Time: {update.message.date.strftime('%Y-%m-%d %H:%M:%S')}\n"
+            f"🕒 Time: {update.message.date.strftime('%Y-%m-%d %H:%M:%S')}\n"
             f"📌 Status: Submitted{remaining}"
         )
     await update.message.reply_text("Main menu:", reply_markup=user_main_menu())
