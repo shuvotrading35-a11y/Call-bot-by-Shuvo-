@@ -10,8 +10,8 @@ CHOICE, GET_USER_ID, GET_PLAN = range(3)
 async def sub_manage_entry(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await is_admin(update): return
     keyboard = [
-        ["➕ Activate Subscription", "➖ Remove Subscription"],
-        ["📋 View History", "🔙 Admin Menu"]
+        [{"text": "➕ Activate Subscription", "style": "success"}, {"text": "➖ Remove Subscription", "style": "danger"}],
+        [{"text": "📋 View History", "style": "primary"}, {"text": "🔙 Admin Menu", "style": "success"}],
     ]
     await update.message.reply_text("💰 Subscription Management", reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True))
     return CHOICE
