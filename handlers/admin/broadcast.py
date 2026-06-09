@@ -8,7 +8,10 @@ TARGET_SELECT, BROADCAST_MSG = range(2)
 
 async def broadcast_entry(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not await is_admin(update): return
-    keyboard = [["All Users", "Premium Users"], ["🔙 Admin Menu"]]
+    keyboard = [
+        [{"text": "👥 All Users", "style": "primary"}, {"text": "⭐ Premium Users", "style": "success"}],
+        [{"text": "🔙 Admin Menu", "style": "success"}],
+    ]
     await update.message.reply_text("Select target:", reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True))
     return TARGET_SELECT
 
@@ -17,7 +20,7 @@ async def broadcast_target(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if choice == "🔙 Admin Menu":
         await update.message.reply_text("Admin panel", reply_markup=admin_main_menu())
         return ConversationHandler.END
-    if choice not in ["All Users", "Premium Users"]:
+    if choice not in ["👥 All Users", "⭐ Premium Users"]:
         await update.message.reply_text("Please select a valid option.")
         return TARGET_SELECT
     context.user_data['broadcast_target'] = choice
@@ -27,9 +30,9 @@ async def broadcast_target(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def broadcast_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
     target = context.user_data.get('broadcast_target')
     conn = get_connection()
-    if target == "All Users":
+    if target == "👥 All Users":
         users = conn.execute("SELECT user_id FROM users WHERE is_banned=0").fetchall()
-    elif target == "Premium Users":
+    elif target == "⭐ Premium Users":
         users = conn.execute("SELECT user_id FROM users WHERE is_premium=1 AND is_banned=0").fetchall()
     else:
         conn.close()
