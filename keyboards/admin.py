@@ -2,15 +2,18 @@ from telegram import ReplyKeyboardMarkup
 
 def admin_main_menu():
     keyboard = [
-        ["📊 Dashboard", "👥 User List"],
-        ["💰 Subscription Manage", "📢 Force Channel"],
-        ["🎁 Generate Code", "⚙️ Settings"],
-        ["📈 Global Stats", "🚫 Banned Users"],
-        ["🌐 Broadcast", "🔓 Unban User"],
-        ["☎️ Support Tickets", "👤 User Panel"]
-           # Admin user panel এ যেতে পারবে
+        [{"text": "📊 Dashboard",           "style": "primary"}, {"text": "👥 User List",       "style": "primary"}],
+        [{"text": "💰 Subscription Manage", "style": "success"}, {"text": "📢 Force Channel",   "style": "success"}],
+        [{"text": "🎁 Generate Code",       "style": "success"}, {"text": "⚙️ Settings",        "style": "primary"}],
+        [{"text": "📈 Global Stats",        "style": "primary"}, {"text": "🚫 Banned Users",    "style": "danger"} ],
+        [{"text": "🌐 Broadcast",           "style": "success"}, {"text": "🔓 Unban User",      "style": "danger"} ],
+        [{"text": "☎️ Support Tickets",     "style": "primary"}],
+        [{"text": "👤 User Panel",          "style": "primary"}],
     ]
-    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, is_persistent=True)
 
 def back_to_admin():
-    return ReplyKeyboardMarkup([["🔙 Admin Menu"]], resize_keyboard=True)
+    return ReplyKeyboardMarkup(
+        [[{"text": "🔙 Admin Menu", "style": "success"}]],
+        resize_keyboard=True
+    )
