@@ -2,17 +2,24 @@ from telegram import ReplyKeyboardMarkup
 
 def user_main_menu(is_admin: bool = False):
     keyboard = [
-        ["🚀 Send Call", "👤 My Profile"],
-        ["👥 Referral", "🛒 Buy Subscription"],
-        ["🎁 Redeem Code", "🎯 Daily Claim"],   # একই row তে
-        ["📊 Statistics", "☎️ Support"]         # পাশাপাশি
+        [{"text": "🚀 Send Call", "style": "primary"},       {"text": "👤 My Profile",      "style": "primary"}],
+        [{"text": "👥 Referral", "style": "primary"},        {"text": "🛒 Buy Subscription", "style": "success"}],
+        [{"text": "🎁 Redeem Code", "style": "success"}],
+        [{"text": "📊 Statistics", "style": "primary"},      {"text": "🎯 Daily Claim",      "style": "success"}],
+        [{"text": "☎️ Support", "style": "primary"}],
     ]
     if is_admin:
-        keyboard.append(["👑 Admin Panel"])
-    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+        keyboard.append([{"text": "👑 Admin Panel", "style": "danger"}])
+    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, is_persistent=True)
 
 def cancel_keyboard():
-    return ReplyKeyboardMarkup([["🔙 Cancel"]], resize_keyboard=True)
+    return ReplyKeyboardMarkup(
+        [[{"text": "🔙 Cancel", "style": "danger"}]],
+        resize_keyboard=True
+    )
 
 def back_to_user_menu():
-    return ReplyKeyboardMarkup([["🔙 Main Menu"]], resize_keyboard=True)
+    return ReplyKeyboardMarkup(
+        [[{"text": "🔙 Main Menu", "style": "success"}]],
+        resize_keyboard=True
+    )
