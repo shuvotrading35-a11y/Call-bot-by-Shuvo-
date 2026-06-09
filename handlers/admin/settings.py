@@ -26,7 +26,7 @@ async def settings_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         val = get_setting(key, 'N/A')
         lines += f"{num}. {label}: {val}\n"
     lines += "\n📝 Enter number to edit (e.g. 1):"
-    keyboard = [["🔙 Admin Menu"]]
+    keyboard = [[{"text": "🔙 Admin Menu", "style": "success"}]]
     await update.message.reply_text(lines, reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True))
     return SETTINGS_MENU
 
@@ -43,9 +43,7 @@ async def select_setting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['edit_setting_key'] = key
     context.user_data['edit_setting_label'] = label
     await update.message.reply_text(
-        f"✏️ Editing: {label}\n"
-        f"Current Value: {current}\n\n"
-        f"Enter new value:",
+        f"✏️ Editing: {label}\nCurrent Value: {current}\n\nEnter new value:",
         reply_markup=back_to_admin()
     )
     return EDIT_VALUE
@@ -58,10 +56,7 @@ async def save_setting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     key = context.user_data.get('edit_setting_key')
     label = context.user_data.get('edit_setting_label')
     set_setting(key, text)
-    await update.message.reply_text(
-        f"✅ {label} updated to: {text}",
-        reply_markup=admin_main_menu()
-    )
+    await update.message.reply_text(f"✅ {label} updated to: {text}", reply_markup=admin_main_menu())
     return ConversationHandler.END
 
 settings_conv = ConversationHandler(
