@@ -33,8 +33,8 @@ async def receive_target(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Invalid number. Try again:\nExample: 017XXXXXXXX")
         return TARGET_NUMBER
     context.user_data['target'] = number
-    keyboard = [[str(limit)] for limit in CALL_LIMITS]
-    keyboard.append(["🔙 Cancel"])
+    keyboard = [[{"text": str(limit), "style": "primary"}] for limit in CALL_LIMITS]
+    keyboard.append([{"text": "🔙 Cancel", "style": "danger"}])
     await update.message.reply_text("⚡ Select Call Limit:", reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True))
     return CALL_LIMIT
 
@@ -57,7 +57,6 @@ async def receive_limit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     free_call_limit = int(get_setting('free_call_limit', '5'))
     credits_per_call = int(get_setting('free_credits_per_call', '1'))
 
-    # Check premium or free limit
     if not user['is_premium']:
         if limit > free_call_limit:
             await update.message.reply_text(
@@ -65,7 +64,6 @@ async def receive_limit(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "🛒 Buy a subscription for unlimited calls!"
             )
             return CALL_LIMIT
-        # Check credits
         if user['credits'] < credits_per_call:
             await update.message.reply_text(
                 f"💰 Insufficient credits!\n"
@@ -74,7 +72,6 @@ async def receive_limit(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return ConversationHandler.END
 
-    # Rate limiting
     limiter = premium_limiter if user['is_premium'] else free_limiter
     if not await limiter.is_allowed(user_id):
         await update.message.reply_text("⏳ Too many requests. Please wait a moment.")
@@ -86,13 +83,11 @@ async def receive_limit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     result = await send_call_api(target, limit)
     status = "failed" if result.get("error") else "submitted"
 
-    # Log to DB
     conn = get_connection()
     conn.execute(
         "INSERT INTO call_logs (user_id, target_number, call_limit, status) VALUES (?,?,?,?)",
         (user_id, target, limit, status)
     )
-    # Deduct credits for free users
     if not user['is_premium'] and status == "submitted":
         conn.execute("UPDATE users SET credits = credits - ? WHERE user_id=?", (credits_per_call, user_id))
     conn.commit()
@@ -106,10 +101,10 @@ async def receive_limit(update: Update, context: ContextTypes.DEFAULT_TYPE):
             updated = get_user(user_id)
             remaining = f"\n💰 Remaining Credits: {updated['credits']}"
         await update.message.reply_text(
-            f"✅ Request Submitted!\n\n"
+            f"✅ Request successful!\n\n"
             f"📞 Target: {target}\n"
             f"📊 Limit: {limit}\n"
-            f"🕒 Time: {update.message.date.strftime('%Y-%m-%d %H:%M:%S')}\n"
+            f"☄️ Time: {update.message.date.strftime('%Y-%m-%d %H:%M:%S')}\n"
             f"📌 Status: Submitted{remaining}"
         )
     await update.message.reply_text("Main menu:", reply_markup=user_main_menu())
