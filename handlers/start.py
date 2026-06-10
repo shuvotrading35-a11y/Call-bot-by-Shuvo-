@@ -15,16 +15,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await check_banned(update): return
     if await check_maintenance(update): return
 
-    # Force join check (admin bypass করবে automatically)
     joined, not_joined = await check_force_join(update, context)
     if not joined:
         await update.message.reply_text(
-            f"⚠️ Bot ব্যবহার করতে নিচের {len(not_joined)}টি channel join করুন:",
+            f"🚫  Access Restricted\n"
+            f"{'─' * 28}\n\n"
+            f"You must join {len(not_joined)} required channel(s)\n"
+            f"before using this bot.\n\n"
+            f"👇  Join below, then tap ✅ Check Again",
             reply_markup=build_join_buttons(not_joined)
         )
         return
 
-    # Referral process
     if context.args and context.args[0].startswith("ref_"):
         try:
             ref_id = int(context.args[0].split("_")[1])
@@ -36,35 +38,49 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     is_admin = user.id in ADMIN_IDS
     if is_admin:
         await update.message.reply_text(
-            f"👑 Welcome Admin {user.first_name}!\n\n"
-            f"Developed by 👨‍💻 Shuvo\nSupport: @shuvo_9882",
+            f"👑  Admin Panel\n"
+            f"{'─' * 28}\n\n"
+            f"Welcome back, {user.first_name}!\n\n"
+            f"🔐  Name  :  {user.first_name}\n"
+            f"🆔  ID      :  {user.id}\n"
+            f"🛡️  Role   :  Administrator\n\n"
+            f"{'─' * 28}\n"
+            f"🛠  Dev: @shuvo_9882",
             reply_markup=admin_main_menu()
         )
     else:
         await update.message.reply_text(
-            f"Welcome to Call Sender Bot, {user.first_name}!\n\n"
-            f"Developed by 👨‍💻 Shuvo\nSupport: @shuvo_9882",
+            f"🚀  Welcome to Call Sender Bot!\n"
+            f"{'─' * 28}\n\n"
+            f"Hey {user.first_name}, glad you're here! 👋\n\n"
+            f"⚡  What you can do:\n"
+            f"  📞  Send calls to any BD number\n"
+            f"  🎯  Claim daily bonus credits\n"
+            f"  👥  Earn credits by referring friends\n"
+            f"  🎁  Redeem codes for free credits\n\n"
+            f"{'─' * 28}\n"
+            f"🛠  Dev: @shuvo_9882",
             reply_markup=user_main_menu()
         )
 
-# Admin → User Panel switch
 async def switch_to_user_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-    if user_id not in ADMIN_IDS:
-        return
+    user = update.effective_user
+    if user.id not in ADMIN_IDS: return
     await update.message.reply_text(
-        "👤 User Panel এ স্বাগতম!\n"
-        "আপনি এখন user হিসেবে bot ব্যবহার করতে পারবেন।",
+        f"👤  User Panel\n"
+        f"{'─' * 28}\n\n"
+        f"✅  You are now in User Mode\n"
+        f"🔐  Tap 👑 Admin Panel to switch back",
         reply_markup=user_main_menu(is_admin=True)
     )
 
-# User Panel → Admin Panel switch
 async def switch_to_admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
-    if user_id not in ADMIN_IDS:
-        return
+    if user_id not in ADMIN_IDS: return
     await update.message.reply_text(
-        "👑 Admin Panel এ ফিরে এসেছেন।",
+        f"👑  Admin Panel\n"
+        f"{'─' * 28}\n\n"
+        f"✅  Switched back to Admin Mode",
         reply_markup=admin_main_menu()
     )
 
