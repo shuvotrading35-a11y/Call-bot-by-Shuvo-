@@ -16,9 +16,17 @@ async def daily_claim(update: Update, context: ContextTypes.DEFAULT_TYPE):
         (user_id,)
     ).fetchone()
     if last and not can_claim_daily(last['claim_date']):
-        await update.message.reply_text("⏳ Already claimed today. Come back in 24 hours!")
         conn.close()
+        await update.message.reply_text(
+            f"⏳  Already Claimed!\n"
+            f"{'─' * 28}\n\n"
+            f"You've already collected today's bonus.\n\n"
+            f"🔄  Come back in 24 hours for your\n"
+            f"    next reward!",
+            reply_markup=user_main_menu()
+        )
         return
+
     reward_min = int(get_setting('daily_reward_min', '1'))
     reward_max = int(get_setting('daily_reward_max', '10'))
     reward = random.randint(reward_min, reward_max)
@@ -30,10 +38,14 @@ async def daily_claim(update: Update, context: ContextTypes.DEFAULT_TYPE):
     conn.commit()
     updated = conn.execute("SELECT credits FROM users WHERE user_id=?", (user_id,)).fetchone()
     conn.close()
+
     await update.message.reply_text(
-        f"🎉 Daily Reward Claimed!\n\n"
-        f"🎁 Reward: +{reward} credits\n"
-        f"💰 Total Credits: {updated['credits']}",
+        f"🎉  Daily Bonus Claimed!\n"
+        f"{'─' * 28}\n\n"
+        f"🎁  Today's Reward  :  +{reward} credits\n"
+        f"💰  Total Credits    :  {updated['credits']}\n\n"
+        f"{'─' * 28}\n"
+        f"⏰  Next claim available in 24 hours",
         reply_markup=user_main_menu()
     )
 
