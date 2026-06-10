@@ -4,7 +4,7 @@ def user_main_menu(is_admin: bool = False):
     keyboard = [
         [{"text": "🚀 Send Call", "style": "danger"},       {"text": "👤 My Profile",      "style": "primary"}],
         [{"text": "👥 Referral", "style": "primary"},        {"text": "🛒 Buy Subscription", "style": "success"}],
-        [{"text": "🎁 Redeem Code", "style": "success"},{"text": "🎯 Daily Claim",      "style": "success"}],
+        [{"text": "🎁 Redeem Code", "style": "success"},  	 {"text": "🎯 Daily Claim",      "style": "success"}],
         [{"text": "📊 Statistics", "style": "primary"},      {"text": "☎️ Support", "style": "danger"}],
        
     ]
