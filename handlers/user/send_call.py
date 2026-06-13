@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes, ConversationHandler, MessageHandler, filt
 from handlers.common import check_force_join, check_banned, check_maintenance
 from services.api_client import send_call_api
 from services.user_service import get_user
-from database import get_connection, get_setting
+from database import get_setting
 from utils.helpers import is_valid_bd_phone
 from utils.rate_limiter import RateLimiter
 from keyboards.user import cancel_keyboard, user_main_menu
@@ -115,27 +115,41 @@ async def receive_limit(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return ConversationHandler.END
 
     target = context.user_data['target']
-    await update.message.reply_text("⏳  Sending request, please wait...")
+
+    # ── Attack Started message ──
+    await update.message.reply_text(
+        f"🚀  Call Attack Started!\n"
+        f"{'─' * 28}\n\n"
+        f"📱  Target          :  {target}\n"
+        f"⚡  Attack Amount  :  {limit}\n"
+        f"🕒  Time              :  {update.message.date.strftime('%Y-%m-%d %H:%M')}\n\n"
+        f"⏳  Processing your request..."
+    )
 
     result = await send_call_api(target, limit)
     status = "failed" if result.get("error") else "submitted"
 
-    conn = get_connection()
-    conn.execute(
-        "INSERT INTO call_logs (user_id, target_number, call_limit, status) VALUES (?,?,?,?)",
-        (user_id, target, limit, status)
-    )
+    # ── Save to DB ──
+    from database import call_logs
+    from datetime import datetime
+    call_logs().insert_one({
+        "user_id": user_id,
+        "target_number": target,
+        "call_limit": limit,
+        "status": status,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    })
     if not user['is_premium'] and status == "submitted":
-        conn.execute("UPDATE users SET credits = credits - ? WHERE user_id=?", (credits_per_call, user_id))
-    conn.commit()
-    conn.close()
+        from database import users as users_col
+        users_col().update_one({"user_id": user_id}, {"$inc": {"credits": -credits_per_call}})
 
     if status == "failed":
         await update.message.reply_text(
-            f"❌  Request Failed\n"
+            f"❌  Attack Failed!\n"
             f"{'─' * 28}\n\n"
-            f"⚠️  Error: {result['error']}\n\n"
-            f"Please try again or contact support.",
+            f"📱  Target   :  {target}\n"
+            f"⚠️  Error     :  {result['error']}\n\n"
+            f"Please try again or contact ☎️ Support.",
             reply_markup=user_main_menu()
         )
     else:
@@ -144,12 +158,12 @@ async def receive_limit(update: Update, context: ContextTypes.DEFAULT_TYPE):
             updated = get_user(user_id)
             remaining = f"\n💰  Remaining Credits  :  {updated['credits']}"
         await update.message.reply_text(
-            f"✅  Request Submitted!\n"
+            f"✅  Attack Session Finished!\n"
             f"{'─' * 28}\n\n"
-            f"📞  Target    :  {target}\n"
-            f"📊  Calls      :  {limit}\n"
-            f"🕒  Time       :  {update.message.date.strftime('%Y-%m-%d %H:%M')}\n"
-            f"📌  Status    :  ✅ Submitted"
+            f"📱  Target          :  {target}\n"
+            f"⚡  Total Sent      :  {limit}/{limit}\n"
+            f"🕒  Completed       :  {update.message.date.strftime('%Y-%m-%d %H:%M')}\n"
+            f"📌  Status           :  ✅ Success"
             f"{remaining}",
             reply_markup=user_main_menu()
         )
