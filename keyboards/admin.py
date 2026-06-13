@@ -7,13 +7,18 @@ def admin_main_menu():
         [{"text": "🎁 Generate Code",       "style": "success"}, {"text": "⚙️ Settings",        "style": "primary"}],
         [{"text": "📈 Global Stats",        "style": "primary"}, {"text": "🚫 Banned Users",    "style": "danger"} ],
         [{"text": "🌐 Broadcast",           "style": "success"}, {"text": "🔓 Unban User",      "style": "danger"} ],
-        [{"text": "☎️ Support Tickets", "style": "primary"},
-    {"text": "👤 User Panel", "style": "primary"}],
+        [{"text": "☎️ Support Tickets",     "style": "primary"}, {"text": "👤 User Panel",      "style": "primary"}],
     ]
-    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, is_persistent=True)
+    return ReplyKeyboardMarkup(
+        keyboard,
+        resize_keyboard=True,
+        is_persistent=True,
+        input_field_placeholder="⚡ BY SHUVO......"
+    )
 
 def back_to_admin():
     return ReplyKeyboardMarkup(
         [[{"text": "🔙 Admin Menu", "style": "success"}]],
-        resize_keyboard=True
+        resize_keyboard=True,
+        input_field_placeholder="⚡ BY SHUVO......"
     )
